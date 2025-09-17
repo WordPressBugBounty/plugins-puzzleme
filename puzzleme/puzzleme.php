@@ -1,7 +1,7 @@
 <?php
 /*
    Plugin Name: PuzzleMe for WordPress
-   Version: 1.2.1
+   Version: 1.2.2
    Description: Embed PuzzleMe puzzles in your posts and pages with a shortcode
    Author: Amuse Labs
    Author URI: https://www.amuselabs.com/
@@ -66,6 +66,14 @@ function puzzleme_iframe_generator($attributes)
             'rel' => true
         )
     );
+    
+    $attributionHTMLTags = array(
+        'a' => array(
+            'href' => true,
+            'target' => true,
+            'style' => true
+        )
+    );
 
     $valid_embed_types = array('crossword', 'sudoku', 'wordsearch', 'quiz', 'krisskross', 'wordf', 'codeword', 'wordrow', 'jigsaw', 'date-picker');
 
@@ -115,7 +123,7 @@ function puzzleme_iframe_generator($attributes)
                         $embed_variables['$embed_type'] = 'data-page="date-picker"';
                     }
                     if (isset($attributes['attribution'])) {
-                        $embed_variables['$attribution_text'] = esc_html($attributes['attribution']);
+                        $embed_variables['$attribution_text'] = wp_kses($attributes['attribution'], $attributionHTMLTags);
                         return wp_kses(strtr($embed_html_attributions, $embed_variables), $allowedHTMLtags);
                     } else {
                         return wp_kses(strtr($embed_html, $embed_variables), $allowedHTMLtags);

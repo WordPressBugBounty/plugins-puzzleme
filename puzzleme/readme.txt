@@ -3,7 +3,7 @@ Contributors: amuselabs
 Tags: crossword, sudoku, quiz, puzzles, games
 Requires at least: 3.9
 Tested up to: 6.8.2
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
