@@ -1,7 +1,7 @@
 <?php
 /*
    Plugin Name: PuzzleMe - Interactive Puzzles for WordPress - Easily publish crosswords, quizzes, word searches and more
-   Version: 1.2.3
+   Version: 1.3.0
    Description: PuzzleMe makes it easy to add interactive games to your WordPress website - no coding required.
    Author: Amuse Labs
    Author URI: https://www.amuselabs.com/
@@ -14,7 +14,51 @@ if (!defined('ABSPATH')) {
 }
 
 if (!defined('PUZZLEME_PLUGIN_VERSION')) {
-    define('PUZZLEME_PLUGIN_VERSION', '1.2.3');
+    define('PUZZLEME_PLUGIN_VERSION', '1.3.0');
+}
+
+function puzzleme_get_logged_in_user_embed_attributes($attributes)
+{
+    if (!isset($attributes['uidsalt'])) {
+        return array(
+            '$user_attributes' => '',
+        );
+    }
+
+    if (!is_user_logged_in()) {
+        return array(
+            '$user_attributes' => '',
+        );
+    }
+
+    $user = wp_get_current_user();
+    if (empty($user->user_email)) {
+        return array(
+            '$user_attributes' => '',
+        );
+    }
+
+    $salt = sanitize_text_field($attributes['uidsalt']);
+    if ($salt === '') {
+        return array(
+            '$user_attributes' => '',
+        );
+    }
+
+    $email = strtolower(trim($user->user_email));
+    $hash = hash('sha256', wp_salt($salt) . $email);
+    $uid = $hash;
+
+    if (isset($attributes['uidprefix'])) {
+        $prefix = sanitize_text_field($attributes['uidprefix']);
+        if ($prefix !== '') {
+            $uid = $prefix . substr($hash, strlen($prefix));
+        }
+    }
+
+    return array(
+        '$user_attributes' => 'data-uid="' . esc_attr($uid) . '" data-display-name="' . esc_attr($user->display_name) . '"',
+    );
 }
 
 function load_puzzle_scripts() {
@@ -55,8 +99,10 @@ function puzzleme_iframe_generator($attributes)
             'data-id' => true,
             'data-set' => true,
             'data-puzzletype' => true,
+            'data-uid' => true,
+            'data-display-name' => true,
             'data-height' => true,
-            'data-mobileMargin' => true,
+            'data-mobilemargin' => true,
             'data-embedparams' => true,
             'data-page' => true,
             'style' => true
@@ -83,17 +129,17 @@ function puzzleme_iframe_generator($attributes)
         )
     );
 
-    $valid_embed_types = array('crossword', 'sudoku', 'wordsearch', 'quiz', 'krisskross', 'wordf', 'codeword', 'wordrow', 'jigsaw', 'date-picker');
+    $valid_embed_types = array('crossword', 'sudoku', 'wordsearch', 'quiz', 'krisskross', 'wordf', 'codeword', 'wordrow', 'jigsaw', 'date-picker', 'group-picker');
 
     $embed_html = '
 
-        <div class="pm-embed-div" $id data-set="$set" $embed_type data-height="700px" data-mobileMargin="10px" $embed_params></div>
+        <div class="pm-embed-div" $id data-set="$set" $embed_type data-height="$height" data-mobilemargin="$mobile_margin" $embed_params $user_attributes></div>
 
         ';
     
     $embed_html_attributions = '
         <div style="position: relative; text-align: center;">
-            <div class="pm-embed-div" $id data-set="$set" $embed_type data-height="700px" data-mobileMargin="10px" $embed_params></div>
+            <div class="pm-embed-div" $id data-set="$set" $embed_type data-height="$height" data-mobilemargin="$mobile_margin" $embed_params $user_attributes></div>
             <div class="pm-attribution-div" style="font-family: sans-serif; font-size: 12px; color:#666666; padding-top: 5px; width: 100%;">$attribution_text</div>
         </div>
         ';
@@ -104,6 +150,9 @@ function puzzleme_iframe_generator($attributes)
         '$embed_params' => '',
         '$id' => '',
         '$attribution_text' => '',
+        '$height' => '700px',
+        '$mobile_margin' => '10px',
+        '$user_attributes' => '',
     );
 
     if (empty($attributes)) {
@@ -115,12 +164,19 @@ function puzzleme_iframe_generator($attributes)
 
                     $embed_variables['$embed_type'] = sanitize_text_field($attributes['type']);
                     $embed_variables['$set'] = sanitize_text_field($attributes['set']);
+                    $embed_variables = array_merge($embed_variables, puzzleme_get_logged_in_user_embed_attributes($attributes));
+                    if (isset($attributes['height'])) {
+                        $embed_variables['$height'] = sanitize_text_field($attributes['height']);
+                    }
+                    if (isset($attributes['mobilemargin'])) {
+                        $embed_variables['$mobile_margin'] = sanitize_text_field($attributes['mobilemargin']);
+                    }
                     if (isset($attributes['embedparams'])) {
                         $embed_variables['$embed_params'] = 'data-embedparams="embed=wp&' . sanitize_text_field($attributes['embedparams']) . '"';
                     } else {
                          $embed_variables['$embed_params'] = 'data-embedparams="embed=wp"' ;
                     }
-                    if ($attributes['type'] != 'date-picker') {
+                    if ($attributes['type'] != 'date-picker' && $attributes['type'] != 'group-picker') {
                         $embed_variables['$embed_type'] = 'data-puzzleType="' . sanitize_text_field($attributes['type']) . '"';
                         if (isset($attributes['id'])) {
                             $embed_variables['$id'] = 'data-id="' . sanitize_text_field($attributes['id']) . '"';
@@ -128,7 +184,7 @@ function puzzleme_iframe_generator($attributes)
                             return "Puzzle ID is missing in the shortcode. Please use the correct shortcode from your PuzzleMe dashboard.";
                         }
                     } else {
-                        $embed_variables['$embed_type'] = 'data-page="date-picker"';
+                        $embed_variables['$embed_type'] = 'data-page="' . sanitize_text_field($attributes['type']) . '"';
                     }
                     if (isset($attributes['attribution'])) {
                         $embed_variables['$attribution_text'] = wp_kses($attributes['attribution'], $attributionHTMLTags);

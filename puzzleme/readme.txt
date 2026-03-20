@@ -2,8 +2,8 @@
 Contributors: amuselabs
 Tags: crossword, sudoku, quiz, puzzles, games
 Requires at least: 3.9
-Tested up to: 6.9.1
-Stable tag: 1.2.3
+Tested up to: 6.9.4
+Stable tag: 1.3.0
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -12,7 +12,7 @@ PuzzleMe makes it easy to add interactive games to your WordPress website - no c
 
 == Description ==
 
-https://www.youtube.com/watch?v=pAfL8UJmLps
+https://www.youtube.com/watch?v=ZUf6JM2d7jM&rel=0
 
 PuzzleMe makes it easy to add interactive games to your WordPress website - no coding required.
 
@@ -83,6 +83,23 @@ PuzzleMe puzzles are designed to work smoothly across:
 
 Your audience can play anywhere, anytime.
 
+**Freemium Model**
+
+PuzzleMe is available as a freemium product. The WordPress plugin allows you to easily embed interactive puzzles created with PuzzleMe on your WordPress website.
+
+With the free plan, you can:
+
+- Install and use the PuzzleMe plugin
+- Create your own puzzles and embed them on your website using the plugin
+
+Some advanced capabilities are available only through paid PuzzleMe plans. These may include customization and branding options, analytics, higher usage limits, and collaboration features.
+For details about available features and plan options, please see our pricing <a target="_blank" href="https://amuselabs.com/pricing/">here</a>.
+
+**Testimonials: See What Our Users Have To Say**
+
+- “I cannot praise Amuse Labs highly enough for the solution they have provided for our use case. I had spent hours searching through WordPress plugins and outdated, unsupported projects that resulted in nothing in headaches. Within 5 minutes on the Amuse Labs website, I had created a puzzle that met all of the needs of the brief, that works responsively, displays beautifully and works perfectly.” - **Ryan Sweeney**
+
+- “Amuse Labs is the dominant player in this space, and with very good reason. They have the slickest interface, the most customization options, and the best analytics.” - **Alex Boisvert, Crossword Nexus**
 
 == Frequently Asked Questions ==
 
