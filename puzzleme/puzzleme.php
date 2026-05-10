@@ -1,7 +1,7 @@
 <?php
 /*
    Plugin Name: PuzzleMe - Interactive Puzzles for WordPress - Easily publish crosswords, quizzes, word searches and more
-   Version: 1.3.0
+   Version: 1.3.1
    Description: PuzzleMe makes it easy to add interactive games to your WordPress website - no coding required.
    Author: Amuse Labs
    Author URI: https://www.amuselabs.com/
@@ -9,12 +9,30 @@
    License URI: https://www.gnu.org/licenses/gpl-2.0.html
    */
 
+/**
+ * Initialize the plugin tracker
+ */
 if (!defined('ABSPATH')) {
     exit;
 }
 
+function appsero_init_tracker_puzzleme() {
+
+    if ( ! class_exists( 'Appsero\Client' ) ) {
+      require_once __DIR__ . '/appsero/src/Client.php';
+    }
+
+    $client = new Appsero\Client( 'eb38226f-a5d2-40f1-a394-e809f6f0c06d', 'PuzzleMe - Interactive Puzzles for WordPress - Easily publish crosswords, quizzes, word searches and more', __FILE__ );
+
+    // Active insights
+    $client->insights()->init();
+
+}
+
+appsero_init_tracker_puzzleme();
+
 if (!defined('PUZZLEME_PLUGIN_VERSION')) {
-    define('PUZZLEME_PLUGIN_VERSION', '1.3.0');
+    define('PUZZLEME_PLUGIN_VERSION', '1.3.1');
 }
 
 function puzzleme_get_logged_in_user_embed_attributes($attributes)
@@ -213,5 +231,3 @@ if (is_admin()) {
     require_once plugin_dir_path(__FILE__) . 'admin/class-puzzleme-admin.php';
     new PuzzleMe_Admin(__FILE__);
 }
-
-?>
